@@ -1,0 +1,28 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+names = []
+purposes = []
+
+for i in range(1,50):
+    # Get website text
+    url = 'http://3.85.131.173:8000/random_company'
+    res = requests.get(url)
+    html_page = res.content
+    soup = BeautifulSoup(html_page, 'html.parser')
+    text = soup.find_all(text=True)
+    
+    # Store Name & Purpose 
+    nameCheck = 'Name'
+    name = [idx for idx in text if idx.lower().startswith(nameCheck.lower())]
+    names.insert(0, name[0][6:])
+    
+    purposeCheck = 'Purpose'
+    purpose = [idx for idx in text if idx.lower().startswith(purposeCheck.lower())]
+    purposes.insert(0, purpose[0][9:])
+    
+  companyInfo = pd.DataFrame([names,purposes]).T
+  print(companyInfo)
+
+companyInfo.to_csv('companyInfo.txt', sep='\t', index=False)
